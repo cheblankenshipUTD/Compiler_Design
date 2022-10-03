@@ -1,0 +1,68 @@
+
+import java_cup.runtime.*;
+
+
+// Do I have to add additional terminals in this file?
+// Keywords
+terminal L_CURLY;    //
+terminal R_CURLY;    //
+terminal L_PAREN;    //
+terminal R_PAREN;    //
+terminal L_SQBRAC;      //
+terminal R_SQBRAC;      //
+terminal COMMA;         //
+terminal COLON;     //
+terminal SEMI_COLON; //
+terminal QUESTION;  //
+terminal WHILE;     //
+terminal IF;        //
+terminal ELSE;      //
+terminal CLASS;
+terminal PRINT;
+terminal PRINTLINE;
+terminal RETURN;
+terminal FINAL;
+terminal VOID;
+terminal INT;
+terminal CHAR;
+terminal BOOL;
+terminal FLOAT;
+terminal READ;
+
+// Unary Operators
+terminal AUTO_INCREMENT;      //
+terminal AUTO_DECREMENT;     //
+terminal BIN_NEG;
+
+// Arithmetic Operators
+terminal MINUS_OP;
+terminal PLUS_OP;
+terminal MULTIPLY_OP;  //
+terminal DIVIDE_OP;    //
+
+// Literals
+terminal TRUE;      //
+terminal FALSE;     //
+
+// Relational and Logic Operators
+terminal AND_OP;    //
+terminal OR_OP;     //
+terminal EQUAL_OP;  //
+terminal NOT_EQUAL_OP;
+terminal GTE_OP;     //
+terminal LTE_OP;     //
+terminal GT_OP;     //
+terminal LT_OP;     //
+
+terminal ASSIGN;    //
+
+//
+terminal ID;        //
+terminal STRINGLIT; //
+terminal CHARLIT;   //
+terminal INTLIT;    //
+terminal FLOATLIT;  //
+
+
+non terminal dummy;
+dummy ::= ;

@@ -1,0 +1,43 @@
+\\ test int, =, id, <, ;, {}
+int a   = 5;
+int b   = 6;
+int sum = 0;
+print ( sum ) ;
+if a < b { sum = 5 + 6 ; }
+else { printline ( "b is greater than a" ) }
+
+\\ class
+class Test
+{
+    final
+}
+
+
+\\ Method
+int sum ( int c , int d ) {
+    return ( c + d ) ;
+} ;
+
+\\ Ternary Operator
+int p = 10 ;
+int q = 11 ;
+bool n = ( p < q ) ? true : false ;
+
+\\ Big Program Test
+class LexerTest
+{
+    \\ Class Attributes
+    int attribute1 = 1 ;
+    int attribute2 = 2 ;
+    bool flag = true ;
+
+    \\ Methods
+    int multiplication ( int a , int b ) {
+        return a * b ;
+    }
+
+    int sub ( int a , int b ) {
+        return a - b ;
+    }
+
+}
