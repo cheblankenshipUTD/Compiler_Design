@@ -1,5 +1,6 @@
 
 import java_cup.runtime.*;
+import java.util.*;
 
 
 // Do I have to add additional terminals in this file?
@@ -30,15 +31,19 @@ terminal FLOAT;
 terminal READ;
 
 // Unary Operators
-terminal AUTO_INCREMENT;      //
-terminal AUTO_DECREMENT;     //
-terminal BIN_NEG;
+terminal AUTO_INCREMENT;    //
+terminal AUTO_DECREMENT;    //
+terminal BIN_NEG;           // tilde (binary negation)
+//terminal UPLUS;             // unary plus e.g: +1, +12
+//terminal UMINUS;            // unary minus e.g: -13, -33
 
 // Arithmetic Operators
 terminal MINUS_OP;
 terminal PLUS_OP;
-terminal MULTIPLY_OP;  //
-terminal DIVIDE_OP;    //
+terminal PREFIXPLUS_OP;
+terminal PREFIXMINUS_OP;
+terminal MULTIPLY_OP;       //
+terminal DIVIDE_OP;         //
 
 // Literals
 terminal TRUE;      //
@@ -57,12 +62,272 @@ terminal LT_OP;     //
 terminal ASSIGN;    //
 
 //
-terminal ID;        //
-terminal STRINGLIT; //
-terminal CHARLIT;   //
-terminal INTLIT;    //
-terminal FLOATLIT;  //
+terminal String ID;         //
+terminal String STRINGLIT;  //
+terminal char CHARLIT;      //
+terminal int INTLIT;        //
+terminal float FLOATLIT;    //
 
 
-non terminal dummy;
-dummy ::= ;
+// Phase 1 Grammar (non-terminals)
+non terminal Program program;
+non terminal Boolean optionalsemi;
+non terminal String type;
+non terminal ArrayList<Stmt> stmts;
+non terminal Stmt stmt;
+non terminal Stmt ifEnd;
+non terminal Name name;
+non terminal ArrayList<Expr> args;
+non terminal ArrayList<Name> readList;
+non terminal ArrayList<Expr> printList;
+non terminal ArrayList<Expr> printLineList;
+non terminal Expr expr;
+
+
+precedence left ELSE;
+precedence left ASSIGN;
+precedence left QUESTION;
+precedence left PLUS_OP, MINUS_OP;
+precedence left MULTIPLY_OP, DIVIDE_OP;
+precedence left AND_OP, OR_OP, EQUAL_OP, NOT_EQUAL_OP, GTE_OP, LTE_OP, GT_OP, LT_OP;
+precedence right PREFIXPLUS_OP, PREFIXMINUS_OP, BIN_NEG;
+
+
+
+
+
+start with program;
+
+
+//program ::= expr: e
+//            {: RESULT = new Program(e); :}
+//            ;
+
+program ::= stmts: sts
+            {:
+                RESULT = new Program(sts);
+            :}
+            ;
+
+
+type ::= INT
+        {: RESULT = "int"; :}
+		|
+		FLOAT
+        {: RESULT = "float"; :}
+        |
+        BOOL
+        {: RESULT = "bool"; :}
+        |
+        CHAR
+        {: RESULT = "char"; :}
+        ;
+
+
+optionalsemi ::= SEMI_COLON
+                {: RESULT = true; :}
+                |
+                {: RESULT = false; :}
+				;
+
+
+ifEnd ::= ELSE stmt:st
+        {: RESULT = st; :}
+        |
+        {: RESULT = null; :}
+        ;
+
+
+stmts ::=stmt:st stmts:sts
+		{:
+            sts.add(0,st);
+            RESULT = sts;
+        :}
+        |
+        {: RESULT = new ArrayList<Stmt>(); :}
+        ;
+
+
+stmt ::=IF L_PAREN expr:e R_PAREN stmt:st ifEnd:elsest
+        {: RESULT = new Stmt(e, st, elsest); :}
+        |
+        WHILE L_PAREN expr:e R_PAREN stmt:st
+        {: RESULT = new Stmt(e, st); :}
+        |
+        name:n ASSIGN expr:e SEMI_COLON
+        {: RESULT = new Stmt(n, e); :}
+		|
+		READ L_PAREN readList:rl R_PAREN SEMI_COLON
+        {: RESULT = new Stmt("read", rl); :}
+		|
+		PRINT L_PAREN printList:pl R_PAREN SEMI_COLON
+        {: RESULT = new Stmt("print", pl); :}
+		|
+		PRINTLINE L_PAREN printLineList:pll R_PAREN SEMI_COLON
+        {: RESULT = new Stmt("printline", pll); :}
+        |
+        ID:id L_PAREN R_PAREN SEMI_COLON
+        {: RESULT = new Stmt(id); :}
+        |
+        ID:id L_PAREN args:args R_PAREN SEMI_COLON
+        {: RESULT = new Stmt(id, args, true); :}
+        |
+        RETURN SEMI_COLON
+        {: RESULT = new Stmt(); :}
+        |
+        RETURN expr:e SEMI_COLON
+        {: RESULT = new Stmt(e); :}
+        |
+        name:n AUTO_INCREMENT SEMI_COLON
+        {: RESULT = new Stmt(n, "++"); :}
+        |
+        name:n AUTO_DECREMENT SEMI_COLON
+        {: RESULT = new Stmt(n, "--"); :}
+        |
+        L_CURLY stmts:sts R_CURLY optionalsemi:opsemi
+        {: RESULT = new Stmt(sts, opsemi); :}
+        ;
+
+
+name ::= ID:id
+        {: RESULT = new Name(id); :}
+        |
+        ID:id L_SQBRAC expr:e R_SQBRAC
+        {: RESULT = new Name(id, e); :}
+        ;
+
+
+args ::= expr:e COMMA args:args
+        {:
+            args.add(0,e);
+            RESULT = args;
+        :}
+		|
+		expr:e
+        {:
+            ArrayList<Expr> temp = new ArrayList<Expr>();
+            temp.add(e);
+            RESULT = temp;
+        :}
+        ;
+
+
+readList ::= name: n COMMA readList: rl
+            {:
+                rl.add(0,n);
+                RESULT = rl;
+            :}
+            |
+            name: n
+            {:
+                ArrayList<Name> temp = new ArrayList<Name>();
+                temp.add(n);
+                RESULT = temp;
+            :}
+            ;
+
+
+//
+printList ::= expr:e COMMA printList:pl
+            {:
+                pl.add(0,e);
+                RESULT = pl;
+            :}
+		    |
+		    expr:e
+            {:
+                ArrayList<Expr> temp = new ArrayList<Expr>();
+                temp.add(e);
+                RESULT = temp;
+            :}
+            ;
+
+printLineList ::= printList:pl
+                {: RESULT = pl; :}
+                |
+                {: RESULT = new ArrayList<Expr>(); :}
+                ;
+
+
+
+expr ::= name: n // name
+         {: RESULT = new Expr(n); :}
+         |
+         ID:id L_PAREN R_PAREN // id ()
+         {: RESULT = new Expr(id, true); :}
+         |
+         ID: id L_PAREN args:args R_PAREN // id ( args )
+         {: RESULT = new Expr(id, args); :}
+         |
+         L_PAREN type:ct R_PAREN expr:e // ( type ) expr
+         {: RESULT = new Expr(ct, e, true); :}
+         |
+         L_PAREN expr:e R_PAREN // ( expr )
+		 {: RESULT = new Expr(e); :}
+		 |
+         STRINGLIT: s // strlit
+         {: RESULT = new Expr(s, "strlit"); :}
+         |
+         CHARLIT: c // charlit
+         {: RESULT = new Expr(c); :}
+         |
+         TRUE // true
+         {: RESULT = new Expr(true); :}
+         |
+         FALSE // false
+         {: RESULT = new Expr(false); :}
+         |
+         INTLIT: n // intlit
+         {: RESULT = new Expr(new Integer(n)); :}
+         |
+         FLOATLIT: f // floatlit
+         {: RESULT = new Expr(new Float(f)); :}
+         |
+         expr: e1 PLUS_OP expr: e2 // expr1 + expr2
+         {: RESULT = new Expr(e1, new BinOp("+"), e2); :}
+         |
+         expr: e1 MINUS_OP expr: e2 // expr1 - expr2
+         {: RESULT = new Expr(e1, new BinOp("-"), e2); :}
+         |
+         expr: e1 MULTIPLY_OP expr: e2 // expr1 * expr2
+         {: RESULT = new Expr(e1, new BinOp("*"), e2); :}
+         |
+         expr: e1 DIVIDE_OP expr: e2 // expr1 / expr2
+         {: RESULT = new Expr(e1, new BinOp("/"), e2); :}
+         |
+         PLUS_OP expr: e // + expr
+         {: RESULT = new Expr(e, "+"); :} %prec PREFIXPLUS_OP
+         |
+         MINUS_OP expr: e // - expr
+         {: RESULT = new Expr(e, "-"); :} %prec PREFIXMINUS_OP
+         |
+         BIN_NEG expr: e // ~ expr
+         {: RESULT = new Expr(e, "~"); :}
+         |
+         expr: e1 GT_OP expr: e2 // expr > expr
+         {: RESULT = new Expr(e1, new BinOp(">"), e2); :}
+         |
+         expr: e1 LT_OP expr: e2 // expr < expr
+         {: RESULT = new Expr(e1, new BinOp("<"), e2); :}
+         |
+         expr: e1 GTE_OP expr: e2 // expr1 >= expr2
+         {: RESULT = new Expr(e1, new BinOp(">="), e2); :}
+         |
+         expr: e1 LTE_OP expr: e2 // expr1 <= expr2
+         {: RESULT = new Expr(e1, new BinOp("<="), e2); :}
+         |
+         expr: e1 EQUAL_OP expr: e2 // expr1 == expr2
+         {: RESULT = new Expr(e1, new BinOp("=="), e2); :}
+         |
+         expr: e1 NOT_EQUAL_OP expr: e2 // expr1 <> expr2
+         {: RESULT = new Expr(e1, new BinOp("<>"), e2); :}
+         |
+         expr: e1 OR_OP expr: e2 // expr1 || expr2
+         {: RESULT = new Expr(e1, new BinOp("||"), e2); :}
+         |
+         expr: e1 AND_OP expr: e2 // expr1 && expr2
+         {: RESULT = new Expr(e1, new BinOp("&&"), e2); :}
+         |
+         L_PAREN expr:e1 QUESTION expr:e2 COLON expr:e3 R_PAREN // expr1 ? expr2 : expr3
+         {: RESULT = new Expr(e1, e2, e3); :}
+         ;

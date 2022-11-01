@@ -12,35 +12,20 @@ default: run
 .java.class:
 		$(JAVAC) -cp $(CP) $*.java
 
-FILE=    Lexer.java      parser.java    sym.java \
-    LexerTest.java
+FILE=    Lexer.java parser.java sym.java\
+	LexerTest.java ScannerTest.java Token.java Program.java Expr.java BinOp.java Name.java Stmt.java
 
-run: besicRegex.txt basicTerminals.txt basicFails.txt basicSyntax.txt
+run: sampleFile.txt
 
 all: Lexer.java parser.java $(FILE:java=class)
 
-besicRegex.txt: all
-		$(JAVA) -cp $(CP) LexerTest besicRegex.txt > besicRegex-output.txt
-		cat besicRegex.txt
-		cat -n besicRegex-output.txt
-
-basicTerminals.txt: all
-		$(JAVA) -cp $(CP) LexerTest basicTerminals.txt > basicTerminals-output.txt
-		cat basicTerminals.txt
-		cat -n basicTerminals-output.txt
-
-basicFails.txt: all
-		$(JAVA) -cp $(CP) LexerTest basicFails.txt > basicFails-output.txt
-		cat basicFails.txt
-		cat -n basicFails-output.txt
-
-basicSyntax.txt: all
-		$(JAVA) -cp $(CP) LexerTest basicSyntax.txt > basicSyntax-output.txt
-		cat basicSyntax.txt
-		cat -n basicSyntax-output.txt
+sampleFile.txt: all
+		$(JAVA) -cp $(CP) ScannerTest sampleFile.txt > sampleFile-output.txt
+		cat sampleFile.txt
+		cat -n sampleFile-output.txt
 
 clean:
-		rm -f *.class *~ *.bak Lexer.java parser.java sym.java
+		rm -f *.class *~ *.bak Lexer.java parser.java sym.java *-output.txt
 
 Lexer.java: tokens.jflex
 		$(JFLEX) tokens.jflex

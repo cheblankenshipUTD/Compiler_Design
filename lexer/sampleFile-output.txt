@@ -1,0 +1,46 @@
+Program:
+if (Expr@52d455b8)
+{
+	{
+		x = 		0;
+	}
+}
+if (Expr@234bef66)
+{
+	{
+		x = 		0;
+	}
+}
+else
+{
+	{
+		x = 		0;
+	}
+}
+while (x)
+	{
+		x = 		0;
+	}
+
+x = 0;
+read(x);
+read(x, x);
+print(x);
+print((x + 1), x);
+printline(x);
+printline();
+x();
+x(Expr@6cc4c815);
+x(Expr@3a82f6ef, Expr@100fc185);
+return;
+return x;
+x++;
+x--;
+{
+	x = 	1;
+}
+{
+	x = 	1;
+}
+{
+

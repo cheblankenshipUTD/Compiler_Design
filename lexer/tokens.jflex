@@ -117,6 +117,8 @@ strlit = \"{strContent}\"
 /* Arithmetic Operators */
 "-"             {return newSym(sym.MINUS_OP, new String(yytext()) );}
 "+"             {return newSym(sym.PLUS_OP, new String(yytext()) );}
+"+"             {return newSym(sym.PREFIXPLUS_OP, new String(yytext()) );}
+"-"             {return newSym(sym.PREFIXMINUS_OP, new String(yytext()) );}
 "*"             {return newSym(sym.MULTIPLY_OP, new String(yytext()) );}
 "/"             {return newSym(sym.DIVIDE_OP, new String(yytext()) );}
 
@@ -144,5 +146,5 @@ strlit = \"{strContent}\"
 {intlit}        {return newSym(sym.INTLIT, new Integer(yytext()));}
 {charlit}       {return newSym(sym.CHARLIT, new Character(yytext().charAt(1)));}
 {strlit}        {return newSym(sym.STRINGLIT, new String(yytext()));}
-{floatlit}      {return newSym(sym.FLOATLIT, new Double(yytext().substring(0, yytext().length()-1)));}
+{floatlit}      {return newSym(sym.FLOATLIT, new Float(yytext()));}
 .               { System.out.println("Illegal char, '" + yytext() + "' line: " + yyline + ", column: " + yychar); }
