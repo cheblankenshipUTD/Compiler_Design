@@ -117,8 +117,6 @@ strlit = \"{strContent}\"
 /* Arithmetic Operators */
 "-"             {return newSym(sym.MINUS_OP, new String(yytext()) );}
 "+"             {return newSym(sym.PLUS_OP, new String(yytext()) );}
-"+"             {return newSym(sym.PREFIXPLUS_OP, new String(yytext()) );}
-"-"             {return newSym(sym.PREFIXMINUS_OP, new String(yytext()) );}
 "*"             {return newSym(sym.MULTIPLY_OP, new String(yytext()) );}
 "/"             {return newSym(sym.DIVIDE_OP, new String(yytext()) );}
 
