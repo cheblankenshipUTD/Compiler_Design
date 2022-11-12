@@ -6,6 +6,7 @@ class Stmt extends Token {
 
     Expr expr;
     Stmt stmt;
+    ArrayList<Fielddecl> fdls;
     ArrayList<Stmt> stmts;
     Stmt elseState;
     Name name;
@@ -92,9 +93,10 @@ class Stmt extends Token {
 
 
     // { stmts } ;
-    public Stmt(ArrayList<Stmt> statements, boolean semi) {
+    public Stmt(ArrayList<Fielddecl> fs, ArrayList<Stmt> statements, boolean semi) {
         this.opsemi = semi;
         this.stmts = statements;
+        this.fdls = fs;
         this.thisId = 11;
     }
 
@@ -161,7 +163,12 @@ class Stmt extends Token {
         }
         else if(this.thisId == 11) {
             String tmp = "";
-            for (Stmt st: stmts) {
+
+            for(Fielddecl fd: this.fdls) {
+                tmp += fd.toString(t+1) + "\n";
+            }
+
+            for (Stmt st: this.stmts) {
                 tmp += st.toString(t+1) + "\n";
             }
             ret = "{\n" + tmp + getTabs(t) + "}\n";

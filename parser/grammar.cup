@@ -122,8 +122,10 @@ memberdecls ::=	fielddecl:f memberdecls:mds
 
 fielddecls ::= fielddecl:f fielddecls:fs
                 {:
-			        fs.add(0,f);
-                    RESULT = fs;
+                    ArrayList<Fielddecl> temp = new ArrayList<Fielddecl>();
+			        temp.add(f);
+			        temp.addAll(fs);
+                    RESULT = temp;
 			    :}
 				|
 				{: RESULT = new ArrayList<Fielddecl>(); :}
@@ -277,8 +279,8 @@ stmt ::=IF L_PAREN expr:e R_PAREN stmt:st ifEnd:elsest
         name:n AUTO_DECREMENT SEMI_COLON
         {: RESULT = new Stmt(n, "--"); :}
         |
-        L_CURLY stmts:sts R_CURLY optionalsemi:opsemi
-        {: RESULT = new Stmt(sts, opsemi); :}
+        L_CURLY fielddecls:fs stmts:sts R_CURLY optionalsemi:opsemi
+        {: RESULT = new Stmt(fs, sts, opsemi); :}
         ;
 
 
