@@ -34,8 +34,6 @@ terminal READ;
 terminal AUTO_INCREMENT;    //
 terminal AUTO_DECREMENT;    //
 terminal BIN_NEG;           // tilde (binary negation)
-//terminal UPLUS;             // unary plus e.g: +1, +12
-//terminal UMINUS;            // unary minus e.g: -13, -33
 
 // Arithmetic Operators
 terminal MINUS_OP;
@@ -71,16 +69,25 @@ terminal float FLOATLIT;    //
 
 // Phase 1 Grammar (non-terminals)
 non terminal Program program;
+non terminal Memberdecls memberdecls;
+non terminal ArrayList<Fielddecl> fielddecls;
+non terminal ArrayList<Methoddecl> methoddecls;
+non terminal Fielddecl fielddecl;
+non terminal Methoddecl methoddecl;
+non terminal Expr optionalexpr;
 non terminal Boolean optionalsemi;
 non terminal String type;
+non terminal ArrayList<Argdecl> argdeclList;
+non terminal ArrayList<Argdecl> argdecls;
+non terminal Argdecl argdecl;
 non terminal ArrayList<Stmt> stmts;
 non terminal Stmt stmt;
 non terminal Stmt ifEnd;
-non terminal Name name;
 non terminal ArrayList<Expr> args;
 non terminal ArrayList<Name> readList;
 non terminal ArrayList<Expr> printList;
 non terminal ArrayList<Expr> printLineList;
+non terminal Name name;
 non terminal Expr expr;
 
 
@@ -99,15 +106,77 @@ precedence right PREFIXPLUS_OP, PREFIXMINUS_OP, BIN_NEG;
 start with program;
 
 
-//program ::= expr: e
-//            {: RESULT = new Program(e); :}
-//            ;
+program ::= CLASS ID:id L_CURLY memberdecls:ms R_CURLY
+			{: RESULT = new Program(id, ms); :}
+			;
 
-program ::= stmts: sts
-            {:
-                RESULT = new Program(sts);
-            :}
-            ;
+
+memberdecls ::=	fielddecl:f memberdecls:mds
+                {: RESULT = new Memberdecls(f, mds); :}
+				|
+				methoddecls:ms
+				{: RESULT = new Memberdecls(ms); :}
+				;
+
+
+
+fielddecls ::= fielddecl:f fielddecls:fs
+                {:
+			        fs.add(0,f);
+                    RESULT = fs;
+			    :}
+				|
+				{: RESULT = new ArrayList<Fielddecl>(); :}
+				;
+
+
+
+methoddecls ::=	methoddecl:m methoddecls:ms
+			    {:
+			        ms.add(0,m);
+			        RESULT = ms;
+				:}
+				|
+				{: RESULT = new ArrayList<Methoddecl>(); :}
+				;
+
+
+
+
+fielddecl ::=	FINAL type:t ID:id optionalexpr:opex SEMI_COLON
+                {: RESULT = new Fielddecl(t, id, opex, true); :}
+				|
+				type:t ID:id optionalexpr:opex SEMI_COLON
+				{: RESULT = new Fielddecl(t, id, opex, false); :}
+				|
+				type:t ID:id L_SQBRAC INTLIT:len R_SQBRAC SEMI_COLON
+				{: RESULT = new Fielddecl(t, id, new Integer(len)); :}
+				;
+
+
+
+
+optionalexpr ::= ASSIGN expr:e
+                 {: RESULT = e; :}
+				 |
+			     {: RESULT = null; :}
+				 ;
+
+
+
+methoddecl ::=  type:t ID:id L_PAREN argdecls:as R_PAREN L_CURLY fielddecls:fs stmts:sts R_CURLY optionalsemi:opsemi
+			    {: RESULT = new Methoddecl(t, id, as, fs, sts, opsemi); :}
+			    |
+			    VOID ID:id L_PAREN argdecls:as R_PAREN L_CURLY fielddecls:fs stmts:sts R_CURLY optionalsemi:opsemi
+				{: RESULT = new Methoddecl("void", id, as, fs, sts, opsemi); :}
+				;
+
+
+optionalsemi ::= SEMI_COLON
+                {: RESULT = true; :}
+                |
+                {: RESULT = false; :}
+				;
 
 
 type ::= INT
@@ -124,11 +193,35 @@ type ::= INT
         ;
 
 
-optionalsemi ::= SEMI_COLON
-                {: RESULT = true; :}
+
+argdecls ::= argdeclList:al
+			 {: RESULT = al; :}
+			 |
+			 {: RESULT = new ArrayList<Argdecl>(); :}
+			 ;
+
+
+argdeclList ::= argdecl:a COLON argdeclList:al
+                {:
+                    al.add(0,a);
+                    RESULT = al;
+                :}
                 |
-                {: RESULT = false; :}
-				;
+                argdecl:a
+                {:
+                    ArrayList<Argdecl> temp = new ArrayList<Argdecl>();
+                    temp.add(a);
+                    RESULT = temp;
+                :}
+                ;
+
+
+argdecl ::= type:t ID:id
+            {: RESULT = new Argdecl(t, id, false); :}
+            |
+            type:t ID:id L_SQBRAC R_SQBRAC
+            {: RESULT = new Argdecl(t, id, true); :}
+            ;
 
 
 ifEnd ::= ELSE stmt:st

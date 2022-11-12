@@ -105,7 +105,7 @@ class Stmt extends Token {
         String ret = "";
 
         if(this.thisId == 0) {
-            ret = "if (" + this.expr.toString() + ")\n" +
+            ret = "if (" + this.expr.toString(t) + ")\n" +
                   (this.thisId == 2 ? stmt.toString(t) : getTabs(t)+"{\n"+stmt.toString(t+1)+"\n"+getTabs(t)+"}") +
                   (this.elseState != null ? "\n"+getTabs(t)+"else\n"+(this.elseState.thisId == 2 ? elseState.toString(t) : getTabs(t) + "{\n" + elseState.toString(t+1) + "\n" + getTabs(t) + "}") : "" );
         }
@@ -145,7 +145,7 @@ class Stmt extends Token {
         else if(this.thisId == 7) {
             String list = "";
             for (Expr e: args) {
-                list += e.toString() + ", ";
+                list += e.toString(t) + ", ";
             }
             list = list.substring(0, list.length() > 0 ? list.length() - 2 : 0);
             ret = this.id + "(" + list + ");";
@@ -164,7 +164,7 @@ class Stmt extends Token {
             for (Stmt st: stmts) {
                 tmp += st.toString(t+1) + "\n";
             }
-            ret = "{\n" + tmp + getTabs(t) + "}";
+            ret = "{\n" + tmp + getTabs(t) + "}\n";
         }
 
 
